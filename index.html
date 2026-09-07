@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>TUS Çalışma Arkadaşı</title>
+<meta name="description" content="Kişisel TUS hazırlık ve çalışma takip uygulaması" />
+<meta name="theme-color" content="#0f172a" />
+<link rel="manifest" href="manifest.webmanifest" />
+<link rel="icon" href="icon-192.png" />
+<link rel="apple-touch-icon" href="icon-180.png" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="TUS Koçu" />
+<link rel="stylesheet" href="tailwind.css" />
+<script>
+/* claude.ai'deki window.storage yerine: IndexedDB tabanlı kalıcı depolama */
+(function () {
+  var DB = "tus-db", ST = "kv", dbp;
+  function db() {
+    if (dbp) return dbp;
+    dbp = new Promise(function (res, rej) {
+      var r = indexedDB.open(DB, 1);
+      r.onupgradeneeded = function () { r.result.createObjectStore(ST); };
+      r.onsuccess = function () { res(r.result); };
+      r.onerror = function () { rej(r.error); };
+    });
+    return dbp;
+  }
+  function store(mode) { return db().then(function (d) { return d.transaction(ST, mode).objectStore(ST); }); }
+  window.storage = {
+    get: function (key) { return store("readonly").then(function (s) { return new Promise(function (res) { var r = s.get(key); r.onsuccess = function () { res(r.result === undefined ? null : { key: key, value: r.result }); }; r.onerror = function () { res(null); }; }); }); },
+    set: function (key, value) { return store("readwrite").then(function (s) { return new Promise(function (res, rej) { var r = s.put(value, key); r.onsuccess = function () { res({ key: key, value: value }); }; r.onerror = function () { rej(r.error); }; }); }); },
+    delete: function (key) { return store("readwrite").then(function (s) { return new Promise(function (res) { var r = s.delete(key); r.onsuccess = function () { res({ key: key, deleted: true }); }; r.onerror = function () { res({ key: key, deleted: false }); }; }); }); },
+    list: function (prefix) { return store("readonly").then(function (s) { return new Promise(function (res) { var r = s.getAllKeys(); r.onsuccess = function () { res({ keys: (r.result || []).filter(function (k) { return !prefix || String(k).indexOf(prefix) === 0; }) }); }; r.onerror = function () { res({ keys: [] }); }; }); }); }
+  };
+})();
+</script>
+</head>
+<body>
+<div id="root"></div>
+<script src="app.js"></script>
+<script>
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", function () { navigator.serviceWorker.register("sw.js").catch(function () {}); });
+}
+</script>
+</body>
+</html>
