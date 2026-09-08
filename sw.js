@@ -1,5 +1,5 @@
 /* TUS Çalışma Arkadaşı - service worker (çevrimdışı + kurulabilirlik) */
-var CACHE = "tus-app-v5";
+var CACHE = "tus-app-v6";
 var CORE = ["./", "./index.html", "./app.js", "./tailwind.css", "./manifest.webmanifest", "./icon-192.png", "./icon-512.png", "./icon-512-maskable.png", "./icon-180.png"];
 self.addEventListener("install", function (e) {
   e.waitUntil(caches.open(CACHE).then(function (c) { return c.addAll(CORE); }).then(function () { return self.skipWaiting(); }));
