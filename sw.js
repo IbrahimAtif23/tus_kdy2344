@@ -1,5 +1,5 @@
 /* TUS Çalışma Arkadaşı - service worker (çevrimdışı + kurulabilirlik) */
-var CACHE = "tus-app-v25";
+var CACHE = "tus-app-v27";
 var CORE = ["./", "./index.html", "./app.js", "./tailwind.css", "./manifest.webmanifest", "./icon-192.png", "./icon-512.png", "./icon-512-maskable.png", "./icon-180.png"];
 self.addEventListener("install", function (e) {
   // cache: "reload" → tarayıcının HTTP önbelleğini atla, sunucudan taze dosya al (eski app.js'in yeni sürüm diye kaydedilmesini önler)
